@@ -1,0 +1,4 @@
+id,name,description
+1,midjourney,Midjourney image generation platform
+2,stable_diffusion,Stable Diffusion with Automatic1111 API
+3,flux,Flux AI image generation

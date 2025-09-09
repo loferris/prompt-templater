@@ -1,0 +1,11 @@
+id,template_id,platform_id,parameters
+1,1,1,--ar 2:3 --s 250 --v 6.1
+2,1,2,"{""steps"": 20, ""cfg_scale"": 5, ""sampler"": ""Euler a""}"
+3,1,3,"{""steps"": 20, ""sampler"": ""euler""}"
+4,2,1,--ar 2:3 --s 300 --v 6.1 --style raw
+5,2,2,"{""steps"": 25, ""cfg_scale"": 7, ""sampler"": ""DPM++ 2M Karras""}"
+6,2,3,"{""steps"": 20, ""sampler"": ""heun""}"
+7,3,1,--ar 16:9 --s 500
+8,3,2,"{""steps"": 30, ""cfg_scale"": 9, ""width"": 1024, ""height"": 576}"
+9,3,3,"{""steps"": 20, ""width"": 1024, ""height"": 576}"
+10,4,1,--ar 3:2 --s 200
