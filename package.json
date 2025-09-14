@@ -1,16 +1,13 @@
 {
   "name": "ai-prompt-builder",
   "version": "0.1.0",
-  "private": true,
+  
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit",
-    "test:notion": "node test-notion-client.js",
-    "test:notion-ts": "npx ts-node test-notion-client.ts",
-    "test:structure": "node validate-structure.js"
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@notionhq/client": "^5.0.0",

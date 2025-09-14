@@ -173,6 +173,7 @@ export async function getTemplates(options?: {
       queryOptions.start_cursor = options.startCursor;
     }
 
+    console.log('notion.databases object:', notion.databases);
     const response = await notion.databases.query(queryOptions);
 
     const templates = response.results
