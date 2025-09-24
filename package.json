@@ -1,16 +1,16 @@
 {
   "name": "ai-prompt-builder",
   "version": "0.1.0",
-  
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "generate-notion-csv": "tsx generate-notion-csv.ts"
   },
   "dependencies": {
-    "@notionhq/client": "^5.0.0",
+    "@notionhq/client": "^5.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.2",

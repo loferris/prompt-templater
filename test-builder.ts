@@ -1,25 +1,26 @@
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
-import { getTemplate } from './src/lib/notion-client';
-
-// --- Configuration ---
-const TEMPLATE_ID_TO_TEST = 1; // <--- Set the ID of the template you want to test
+import { getTemplates } from './src/lib/notion-client';
 
 async function testBuilder() {
-  console.log(`Fetching template with ID: ${TEMPLATE_ID_TO_TEST}...`);
+  console.log('Fetching templates from Notion...');
 
   try {
-    const rawTemplate = await getTemplate(TEMPLATE_ID_TO_TEST);
+    const { templates, keywords, platforms } = await getTemplates();
 
-    if (!rawTemplate) {
-      console.error(`--- Template with ID ${TEMPLATE_ID_TO_TEST} not found or there was an error. ---`);
+    if (!templates || templates.length === 0) {
+      console.error('--- No templates found or there was an error. ---');
       return;
     }
 
     console.log('\n--- SUCCESS! --- ');
-    console.log('Successfully fetched raw data from Notion. The structure is below:');
-    console.log(JSON.stringify(rawTemplate, null, 2));
+    console.log(`Successfully fetched ${templates.length} templates from Notion.`);
+    console.log('First template:');
+    console.log(JSON.stringify(templates[0], null, 2));
+
+    console.log(`\nSuccessfully fetched ${keywords.length} keywords.`);
+    console.log(`Successfully fetched ${platforms.length} platforms.`);
 
   } catch (error) {
     console.error('\n--- SCRIPT ERROR ---');

@@ -1,34 +1,28 @@
 import { ParsedTemplate, Keyword, Platform } from './types';
+import { getTemplates } from './notion-client';
+import { loadAllTemplateData } from './csv-utils';
 
 /**
  * Load all template data from Notion.
+ * Fails fast if Notion is not configured or unavailable.
  */
 export async function loadTemplateData(): Promise<{
   templates: ParsedTemplate[];
   keywords: Keyword[];
   platforms: Platform[];
-  source: 'notion' | 'fallback';
+  source: 'notion';
 }> {
-  if (process.env.NOTION_API_KEY && process.env.NOTION_DATABASE_ID) {
-    try {
-      const { getTemplates } = await import('./notion-client');
-      const notionData = await getTemplates();
-      return {
-        templates: notionData.templates,
-        keywords: notionData.keywords,
-        platforms: notionData.platforms,
-        source: 'notion'
-      };
-    } catch (notionError) {
-      console.error('Failed to fetch data from Notion:', notionError);
-    }
+  if (!process.env.NOTION_API_KEY) {
+    throw new Error('NOTION_API_KEY environment variable is required');
+  }
+  
+  if (!process.env.NOTION_DATABASE_ID) {
+    throw new Error('NOTION_DATABASE_ID environment variable is required');
   }
 
-  // Return empty data if Notion is not configured or fails
+  const notionData = await getTemplates();
   return {
-    templates: [],
-    keywords: [],
-    platforms: [],
-    source: 'fallback'
+    ...notionData,
+    source: 'notion'
   };
 }

@@ -9,3 +9,54 @@ id,template_id,platform_id,parameters
 8,3,2,"{""steps"": 30, ""cfg_scale"": 9, ""width"": 1024, ""height"": 576}"
 9,3,3,"{""steps"": 20, ""width"": 1024, ""height"": 576}"
 10,4,1,--ar 3:2 --s 200
+11,4,2,"{""steps"": 25, ""cfg_scale"": 6, ""sampler"": ""Euler a"", ""width"": 768, ""height"": 512}"
+12,4,3,"{""steps"": 20, ""sampler"": ""ipndm"", ""width"": 768, ""height"": 512}"
+
+13,5,1,--ar 16:9 --s 350 --v 6.1
+12,5,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+13,5,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+14,6,1,--ar 16:9 --s 350 --v 6.1
+15,6,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+16,6,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+17,7,1,--ar 16:9 --s 350 --v 6.1
+18,7,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+19,7,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+20,8,1,--ar 16:9 --s 350 --v 6.1
+21,8,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+22,8,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+23,9,1,--ar 16:9 --s 350 --v 6.1
+24,9,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+25,9,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+26,10,1,--ar 16:9 --s 350 --v 6.1
+27,10,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+28,10,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+29,11,1,--ar 16:9 --s 350 --v 6.1
+30,11,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+31,11,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+32,12,1,--ar 16:9 --s 350 --v 6.1
+33,12,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+34,12,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+35,13,1,--ar 16:9 --s 350 --v 6.1
+36,13,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+37,13,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+38,14,1,--ar 16:9 --s 350 --v 6.1
+39,14,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+40,14,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+41,15,1,--ar 16:9 --s 350 --v 6.1
+42,15,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+43,15,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+44,16,1,--ar 16:9 --s 350 --v 6.1
+45,16,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+46,16,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+47,17,1,--ar 16:9 --s 350 --v 6.1
+48,17,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+49,17,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+50,18,1,--ar 16:9 --s 350 --v 6.1
+51,18,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+52,18,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+53,19,1,--ar 16:9 --s 350 --v 6.1
+54,19,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+55,19,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"
+56,20,1,--ar 16:9 --s 350 --v 6.1
+57,20,2,"{""steps"":30,""cfg_scale"":7.5,""sampler"":""Euler a"",""width"":768,""height"":512}"
+58,20,3,"{""steps"":25,""sampler"":""euler"",""width"":768,""height"":512}"

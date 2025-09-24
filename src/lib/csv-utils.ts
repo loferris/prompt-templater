@@ -8,6 +8,8 @@ import {
   ParsedTemplate,
   PlatformParams
 } from './types';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * Parse CSV string into array of objects
@@ -99,8 +101,7 @@ export function parseVariables(variablesString: string): string[] {
  */
 export async function loadTemplatesFromCSV(csvPath: string): Promise<TemplateNormalized[]> {
   try {
-    const response = await fetch(csvPath);
-    const csvContent = await response.text();
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
     return parseCSV<TemplateNormalized>(csvContent);
   } catch (error) {
     console.error('Error loading templates CSV:', error);
@@ -113,8 +114,7 @@ export async function loadTemplatesFromCSV(csvPath: string): Promise<TemplateNor
  */
 export async function loadKeywordsFromCSV(csvPath: string): Promise<Keyword[]> {
   try {
-    const response = await fetch(csvPath);
-    const csvContent = await response.text();
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
     return parseCSV<Keyword>(csvContent);
   } catch (error) {
     console.error('Error loading keywords CSV:', error);
@@ -127,8 +127,7 @@ export async function loadKeywordsFromCSV(csvPath: string): Promise<Keyword[]> {
  */
 export async function loadPlatformsFromCSV(csvPath: string): Promise<Platform[]> {
   try {
-    const response = await fetch(csvPath);
-    const csvContent = await response.text();
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
     return parseCSV<Platform>(csvContent);
   } catch (error) {
     console.error('Error loading platforms CSV:', error);
@@ -141,8 +140,7 @@ export async function loadPlatformsFromCSV(csvPath: string): Promise<Platform[]>
  */
 export async function loadTemplateKeywordsFromCSV(csvPath: string): Promise<TemplateKeyword[]> {
   try {
-    const response = await fetch(csvPath);
-    const csvContent = await response.text();
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
     return parseCSV<TemplateKeyword>(csvContent);
   } catch (error) {
     console.error('Error loading template keywords CSV:', error);
@@ -155,8 +153,7 @@ export async function loadTemplateKeywordsFromCSV(csvPath: string): Promise<Temp
  */
 export async function loadTemplatePlatformParamsFromCSV(csvPath: string): Promise<TemplatePlatformParameters[]> {
   try {
-    const response = await fetch(csvPath);
-    const csvContent = await response.text();
+    const csvContent = fs.readFileSync(csvPath, 'utf-8');
     return parseCSV<TemplatePlatformParameters>(csvContent);
   } catch (error) {
     console.error('Error loading template platform parameters CSV:', error);
@@ -220,12 +217,15 @@ export function combineTemplateData(
 /**
  * Load all template data from CSV files
  */
-export async function loadAllTemplateData(basePath = '/data/normalized'): Promise<{
+export async function loadAllTemplateData(basePath = 'data/normalized'): Promise<{
   templates: ParsedTemplate[];
   keywords: Keyword[];
   platforms: Platform[];
 }> {
   try {
+    const projectRoot = process.cwd();
+    const dataPath = path.join(projectRoot, basePath);
+
     const [
       templates,
       keywords,
@@ -233,11 +233,11 @@ export async function loadAllTemplateData(basePath = '/data/normalized'): Promis
       templateKeywords,
       templatePlatformParams
     ] = await Promise.all([
-      loadTemplatesFromCSV(`${basePath}/templates_normalized.csv`),
-      loadKeywordsFromCSV(`${basePath}/keywords.csv`),
-      loadPlatformsFromCSV(`${basePath}/platforms.csv`),
-      loadTemplateKeywordsFromCSV(`${basePath}/template_keywords.csv`),
-      loadTemplatePlatformParamsFromCSV(`${basePath}/template_platform_parameters.csv`)
+      loadTemplatesFromCSV(path.join(dataPath, 'templates_normalized.csv')),
+      loadKeywordsFromCSV(path.join(dataPath, 'keywords.csv')),
+      loadPlatformsFromCSV(path.join(dataPath, 'platforms.csv')),
+      loadTemplateKeywordsFromCSV(path.join(dataPath, 'template_keywords.csv')),
+      loadTemplatePlatformParamsFromCSV(path.join(dataPath, 'template_platform_parameters.csv'))
     ]);
 
     const parsedTemplates = combineTemplateData(
@@ -260,5 +260,95 @@ export async function loadAllTemplateData(basePath = '/data/normalized'): Promis
       keywords: [],
       platforms: []
     };
+  }
+}
+
+/**
+ * Escape CSV field value (wrap in quotes if contains comma, quote, or newline)
+ */
+function escapeCSVField(value: string): string {
+  if (!value) return '';
+  
+  // If field contains comma, quote, or newline, wrap in quotes and escape internal quotes
+  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+    return '"' + value.replace(/"/g, '""') + '"';
+  }
+  
+  return value;
+}
+
+/**
+ * Generate Notion-optimized CSV from normalized data
+ */
+export async function generateNotionCSV(basePath = 'data/normalized'): Promise<string> {
+  const { templates } = await loadAllTemplateData(basePath);
+  
+  // CSV header matching Notion structure
+  const headers = [
+    'id', 'name', 'description', 'base_prompt', 'variables', 
+    'example_values', 'category', 'keywords', 'mj_params', 'sd_params', 'flux_params'
+  ];
+  
+  const csvLines = [headers.join(',')];
+  
+  templates.forEach(template => {
+    // Join keywords into comma-separated string
+    const keywordsString = template.keywords?.map(k => k.keyword).join(', ') || '';
+    
+    // Convert platform params to JSON strings
+    const mjParams = template.platformParams.midjourney || '';
+    const sdParams = template.platformParams.stable_diffusion 
+      ? JSON.stringify(template.platformParams.stable_diffusion) 
+      : '';
+    const fluxParams = template.platformParams.flux 
+      ? JSON.stringify(template.platformParams.flux) 
+      : '';
+    
+    // Convert variables array back to comma-separated string
+    const variablesString = template.variables.join(', ');
+    
+    const row = [
+      escapeCSVField(template.id),
+      escapeCSVField(template.name),
+      escapeCSVField(template.description),
+      escapeCSVField(template.base_prompt),
+      escapeCSVField(variablesString),
+      escapeCSVField(template.example_values),
+      escapeCSVField(template.category),
+      escapeCSVField(keywordsString),
+      escapeCSVField(mjParams),
+      escapeCSVField(sdParams),
+      escapeCSVField(fluxParams)
+    ];
+    
+    csvLines.push(row.join(','));
+  });
+  
+  return csvLines.join('\n');
+}
+
+/**
+ * Generate and save Notion CSV file
+ */
+export async function saveNotionCSV(
+  outputPath = 'data/notion/templates_generated.csv',
+  basePath = 'data/normalized'
+): Promise<void> {
+  try {
+    const csvContent = await generateNotionCSV(basePath);
+    const projectRoot = process.cwd();
+    const fullOutputPath = path.join(projectRoot, outputPath);
+    
+    // Ensure directory exists
+    const dir = path.dirname(fullOutputPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    
+    fs.writeFileSync(fullOutputPath, csvContent, 'utf-8');
+    console.log(`Notion CSV generated successfully: ${fullOutputPath}`);
+  } catch (error) {
+    console.error('Error generating Notion CSV:', error);
+    throw error;
   }
 }

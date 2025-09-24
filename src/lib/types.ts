@@ -7,7 +7,7 @@ export interface Platform {
 }
 
 export interface Template {
-  id: number;
+  id: string;
   name: string;
   description: string;
   base_prompt: string;
@@ -20,7 +20,7 @@ export interface Template {
 }
 
 export interface TemplateNormalized {
-  id: number;
+  id: string;
   name: string;
   description: string;
   base_prompt: string;
@@ -38,13 +38,13 @@ export interface Keyword {
 
 export interface TemplateKeyword {
   id: number;
-  template_id: number;
+  template_id: string;
   keyword_id: number;
 }
 
 export interface TemplatePlatformParameters {
   id: number;
-  template_id: number;
+  template_id: string;
   platform_id: number;
   parameters: string; // JSON string for SD/Flux, plain string for MJ
 }
