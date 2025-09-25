@@ -1,0 +1,23 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit security check..."
+
+# Prevent committing real API keys
+if git diff --cached | grep -E "(sk-[a-zA-Z0-9]{20,}|secret_[a-zA-Z0-9]{20,}|ntn_[a-zA-Z0-9]{20,}|pat[a-zA-Z0-9]{20,})"; then
+  echo "🚨 ERROR: Potential API key detected!"
+  echo "Please remove any real API keys before committing."
+  echo "Add them to .env.local instead (which is gitignored)."
+  exit 1
+fi
+
+# Prevent committing .env.local
+if git diff --cached --name-only | grep -E "^\.env\.local$"; then
+  echo "🚨 ERROR: .env.local file detected!"
+  echo "Never commit .env.local files as they contain secrets."
+  echo "Add your secrets to .env.local (gitignored) instead."
+  exit 1
+fi
+
+echo "✅ Pre-commit security check passed"
+exit 0

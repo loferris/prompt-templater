@@ -10,6 +10,32 @@ A Next.js application for creating, managing, and using AI prompt templates acro
 - TypeScript support with strict type checking
 - Responsive UI built with Tailwind CSS
 
+## Security
+
+This project follows security best practices:
+
+- **No Secrets in Repository**: All API keys and secrets are loaded from environment variables
+- **Example Configuration Only**: The `.env.example` file contains only placeholder values
+- **Proper Secret Management**: Real API keys should be stored in `.env.local` (gitignored)
+- **Pre-commit Hook Available**: A pre-commit hook prevents accidental committing of real secrets
+
+## Pre-commit Hook
+
+This repository includes a pre-commit hook that prevents accidental committing of real API keys. The hook is automatically active if you have husky installed.
+
+To manually set up the pre-commit hook:
+
+```bash
+# Make the hook executable
+chmod +x .husky/pre-commit
+```
+
+The hook will automatically run before each commit and check for:
+- Potential API keys (patterns like `sk-...`, `secret_...`, `ntn_...`, `pat...`)
+- Accidentally committed `.env.local` files
+
+If any potential secrets are detected, the commit will be blocked with an error message.
+
 ## Getting Started
 
 ### Prerequisites
@@ -38,7 +64,7 @@ A Next.js application for creating, managing, and using AI prompt templates acro
    ```bash
    cp .env.example .env.local
    ```
-   Then edit `.env.local` and add your API keys.
+   Then edit `.env.local` and add your API keys (**never commit this file**).
 
 ### Environment Variables
 
