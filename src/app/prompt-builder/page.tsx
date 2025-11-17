@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ParsedTemplate, Platform } from '@/src/lib/types';
+import { authenticatedFetch } from '@/src/lib/api-client';
 
 // Mock platforms data - in a real app this would come from an API
 const PLATFORMS: Platform[] = [
@@ -31,7 +32,7 @@ export default function PromptBuilderPage() {
   useEffect(() => {
     async function loadTemplates() {
       try {
-        const response = await fetch('/api/templates');
+        const response = await authenticatedFetch('/api/templates');
         const data = await response.json();
         setTemplates(data.templates || []);
         if (data.templates?.length > 0) {
@@ -102,7 +103,7 @@ export default function PromptBuilderPage() {
         })
       };
 
-      const response = await fetch('/api/enhance', {
+      const response = await authenticatedFetch('/api/enhance', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

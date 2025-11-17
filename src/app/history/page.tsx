@@ -5,6 +5,7 @@ import { SavedPrompt } from '@/src/lib/prompt-history';
 import { Card, CardHeader, CardContent } from '@/src/components/ui/Card';
 import { Button } from '@/src/components/ui/Button';
 import { Input } from '@/src/components/ui/Input';
+import { authenticatedFetch } from '@/src/lib/api-client';
 
 export default function HistoryPage() {
   const [prompts, setPrompts] = useState<SavedPrompt[]>([]);
@@ -25,7 +26,7 @@ export default function HistoryPage() {
         ? '/api/history/favorites'
         : '/api/history';
 
-      const response = await fetch(url);
+      const response = await authenticatedFetch(url);
       const data = await response.json();
       setPrompts(data.prompts || []);
     } catch (error) {
@@ -37,7 +38,7 @@ export default function HistoryPage() {
 
   const loadStats = async () => {
     try {
-      const response = await fetch('/api/history?stats=true');
+      const response = await authenticatedFetch('/api/history?stats=true');
       const data = await response.json();
       setStats(data.stats);
     } catch (error) {
@@ -53,7 +54,7 @@ export default function HistoryPage() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/history?q=${encodeURIComponent(searchQuery)}`);
+      const response = await authenticatedFetch(`/api/history?q=${encodeURIComponent(searchQuery)}`);
       const data = await response.json();
       setPrompts(data.prompts || []);
     } catch (error) {
@@ -65,7 +66,7 @@ export default function HistoryPage() {
 
   const toggleFavorite = async (id: string, currentStatus: boolean) => {
     try {
-      await fetch(`/api/history/${id}`, {
+      await authenticatedFetch(`/api/history/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isFavorite: !currentStatus }),
@@ -83,7 +84,7 @@ export default function HistoryPage() {
     }
 
     try {
-      await fetch(`/api/history/${id}`, { method: 'DELETE' });
+      await authenticatedFetch(`/api/history/${id}`, { method: 'DELETE' });
       loadHistory();
       loadStats();
     } catch (error) {

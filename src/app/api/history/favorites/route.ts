@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getFavorites } from '@/src/lib/prompt-history';
+import { validateRequest } from '@/src/lib/server-session';
 
 /**
  * GET /api/history/favorites
@@ -7,8 +8,16 @@ import { getFavorites } from '@/src/lib/prompt-history';
  */
 export async function GET(req: NextRequest) {
   try {
-    // Get user ID from session when authentication is implemented
-    const userId = undefined; // TODO: Get from session
+    // Validate API key from request
+    const validation = validateRequest(req);
+    if (!validation.valid || !validation.apiKey) {
+      return NextResponse.json(
+        { error: 'Authentication required', message: validation.error || 'Please log in' },
+        { status: 401 }
+      );
+    }
+
+    const userId = validation.apiKey; // Use API key as user ID
 
     const favorites = await getFavorites(userId);
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIdentifier } from '@/src/lib/rate-limiter';
 import { sanitizePromptInput } from '@/src/lib/validation';
+import { validateRequest } from '@/src/lib/server-session';
 
 const MAX_PROMPT_LENGTH = 2000;
 const MAX_REQUESTS_PER_MINUTE = 10;
@@ -15,13 +16,7 @@ interface EnhanceRequestBody {
 }
 
 // Enhanced LLM client with system prompt support and error handling
-async function callLlmWithSystem(systemPrompt: string, userPrompt: string): Promise<string> {
-  const apiKey = process.env.OPENROUTER_API_KEY;
-
-  if (!apiKey) {
-    throw new Error('OPENROUTER_API_KEY is not configured. Please add it to your environment variables.');
-  }
-
+async function callLlmWithSystem(apiKey: string, systemPrompt: string, userPrompt: string): Promise<string> {
   const model = process.env.OPENROUTER_MODEL || 'openai/gpt-3.5-turbo';
 
   try {
@@ -53,7 +48,7 @@ async function callLlmWithSystem(systemPrompt: string, userPrompt: string): Prom
       }
 
       if (response.status === 401) {
-        throw new Error('Invalid API key. Please check your OpenRouter API configuration.');
+        throw new Error('Invalid API key. Please log in again with a valid API key.');
       } else if (response.status === 429) {
         throw new Error('AI service rate limit exceeded. Please try again in a moment.');
       } else if (response.status >= 500) {
@@ -80,6 +75,17 @@ async function callLlmWithSystem(systemPrompt: string, userPrompt: string): Prom
 
 export async function POST(req: NextRequest) {
   try {
+    // Validate API key from request
+    const validation = validateRequest(req);
+    if (!validation.valid || !validation.apiKey) {
+      return NextResponse.json(
+        { error: 'Authentication required', message: validation.error || 'Please log in' },
+        { status: 401 }
+      );
+    }
+
+    const userApiKey = validation.apiKey;
+
     // Rate limiting
     const clientId = getClientIdentifier(req);
     const rateLimit = checkRateLimit(clientId, {
@@ -202,8 +208,8 @@ Return ONLY the enhanced prompt, no explanations.`;
 
     const userPrompt = `Enhance this prompt for an AI image generator:\n\n"${combinedPrompt}"`;
 
-    // Call the LLM with system + user prompt
-    const enhancedPrompt = await callLlmWithSystem(systemPrompt, userPrompt);
+    // Call the LLM with user's API key
+    const enhancedPrompt = await callLlmWithSystem(userApiKey, systemPrompt, userPrompt);
 
     // Apply platform parameters
     const finalPrompt = applyPlatformParameters(enhancedPrompt, platform, platformParams);
@@ -228,14 +234,14 @@ Return ONLY the enhanced prompt, no explanations.`;
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
     const isUserError = errorMessage.includes('API key') ||
                         errorMessage.includes('rate limit') ||
-                        errorMessage.includes('not configured');
+                        errorMessage.includes('log in');
 
     return NextResponse.json(
       {
-        error: isUserError ? 'Configuration error' : 'Internal server error',
+        error: isUserError ? 'Authentication error' : 'Internal server error',
         message: errorMessage,
       },
-      { status: isUserError ? 503 : 500 }
+      { status: isUserError ? 401 : 500 }
     );
   }
 }

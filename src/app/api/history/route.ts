@@ -6,6 +6,7 @@ import {
   getStats,
 } from '@/src/lib/prompt-history';
 import { GeneratedPrompt } from '@/src/lib/types';
+import { validateRequest } from '@/src/lib/server-session';
 
 /**
  * GET /api/history
@@ -13,13 +14,21 @@ import { GeneratedPrompt } from '@/src/lib/types';
  */
 export async function GET(req: NextRequest) {
   try {
+    // Validate API key from request
+    const validation = validateRequest(req);
+    if (!validation.valid || !validation.apiKey) {
+      return NextResponse.json(
+        { error: 'Authentication required', message: validation.error || 'Please log in' },
+        { status: 401 }
+      );
+    }
+
+    const userId = validation.apiKey; // Use API key as user ID
+
     const { searchParams } = new URL(req.url);
     const query = searchParams.get('q');
     const limit = searchParams.get('limit');
     const statsOnly = searchParams.get('stats');
-
-    // Get user ID from session when authentication is implemented
-    const userId = undefined; // TODO: Get from session
 
     if (statsOnly === 'true') {
       const stats = await getStats(userId);
@@ -49,6 +58,17 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    // Validate API key from request
+    const validation = validateRequest(req);
+    if (!validation.valid || !validation.apiKey) {
+      return NextResponse.json(
+        { error: 'Authentication required', message: validation.error || 'Please log in' },
+        { status: 401 }
+      );
+    }
+
+    const userId = validation.apiKey; // Use API key as user ID
+
     const body = await req.json();
     const { prompt, values, platform, parameters, enhanced, templateId, tags } = body;
 
@@ -59,9 +79,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-
-    // Get user ID from session when authentication is implemented
-    const userId = undefined; // TODO: Get from session
 
     const generatedPrompt: GeneratedPrompt = {
       templateId: templateId || 'custom',

@@ -4,6 +4,7 @@ import {
   updatePrompt,
   deletePrompt,
 } from '@/src/lib/prompt-history';
+import { validateRequest } from '@/src/lib/server-session';
 
 /**
  * GET /api/history/[id]
@@ -14,12 +15,29 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Validate API key from request
+    const validation = validateRequest(req);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { error: 'Authentication required', message: validation.error || 'Please log in' },
+        { status: 401 }
+      );
+    }
+
     const prompt = await getPromptById(params.id);
 
     if (!prompt) {
       return NextResponse.json(
         { error: 'Prompt not found' },
         { status: 404 }
+      );
+    }
+
+    // Verify ownership (API key match)
+    if (prompt.userId && prompt.userId !== validation.apiKey) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 403 }
       );
     }
 
@@ -42,6 +60,31 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Validate API key from request
+    const validation = validateRequest(req);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { error: 'Authentication required', message: validation.error || 'Please log in' },
+        { status: 401 }
+      );
+    }
+
+    // Verify ownership before update
+    const existingPrompt = await getPromptById(params.id);
+    if (!existingPrompt) {
+      return NextResponse.json(
+        { error: 'Prompt not found' },
+        { status: 404 }
+      );
+    }
+
+    if (existingPrompt.userId && existingPrompt.userId !== validation.apiKey) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const { isFavorite, tags } = body;
 
@@ -89,6 +132,31 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
+    // Validate API key from request
+    const validation = validateRequest(req);
+    if (!validation.valid) {
+      return NextResponse.json(
+        { error: 'Authentication required', message: validation.error || 'Please log in' },
+        { status: 401 }
+      );
+    }
+
+    // Verify ownership before delete
+    const existingPrompt = await getPromptById(params.id);
+    if (!existingPrompt) {
+      return NextResponse.json(
+        { error: 'Prompt not found' },
+        { status: 404 }
+      );
+    }
+
+    if (existingPrompt.userId && existingPrompt.userId !== validation.apiKey) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 403 }
+      );
+    }
+
     const success = await deletePrompt(params.id);
 
     if (!success) {
