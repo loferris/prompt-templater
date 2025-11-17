@@ -74,7 +74,7 @@ export interface PromptValues {
 }
 
 export interface GeneratedPrompt {
-  templateId: number;
+  templateId: string;
   platform: Platform['name'];
   prompt: string;
   parameters?: string | PlatformParams;
@@ -193,7 +193,7 @@ export type OptionalFields<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, 
 export interface AnalyticsEvent {
   event: string;
   properties: {
-    template_id?: number;
+    template_id?: string;
     platform?: Platform['name'];
     category?: string;
     [key: string]: any;

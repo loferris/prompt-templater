@@ -17,7 +17,7 @@ export const PlatformSchema = z.object({
 });
 
 export const TemplateSchema = z.object({
-  id: z.number().positive(),
+  id: z.string().min(1),
   name: z.string().min(1, 'Template name is required').max(100, 'Template name too long'),
   description: z.string().min(1, 'Description is required').max(500, 'Description too long'),
   base_prompt: z.string().min(1, 'Base prompt is required'),
